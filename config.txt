@@ -1,0 +1,4 @@
+arm_64bit=1
+armstub=RPI_EFI.fd
+boot_delay=0
+enable_uart=1
