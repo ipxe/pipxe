@@ -7,3 +7,6 @@
 [submodule "edk2-non-osi"]
 	path = edk2-non-osi
 	url = https://github.com/tianocore/edk2-non-osi.git
+[submodule "ipxe"]
+	path = ipxe
+	url = https://git.ipxe.org/ipxe.git
