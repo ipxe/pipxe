@@ -13,7 +13,10 @@ IPXE_SRC	:= ipxe/src
 IPXE_TGT	:= bin-arm64-efi/rpi.efi
 IPXE_EFI	:= $(IPXE_SRC)/$(IPXE_TGT)
 
-all : submodules firmware efi ipxe
+SDCARD_MB	:= 32
+export MTOOLSRC	:= mtoolsrc
+
+all : sdcard.img
 
 submodules :
 	git submodule update --init --recursive
@@ -40,8 +43,18 @@ ipxe : $(IPXE_EFI)
 $(IPXE_EFI) : submodules
 	$(MAKE) -C $(IPXE_SRC) CROSS=$(IPXE_CROSS) CONFIG=rpi $(IPXE_TGT)
 
-.PHONY : submodules firmware efi efi-basetools $(EFI_FD) ipxe $(IPXE_EFI)
+sdcard.img : firmware efi ipxe
+	truncate -s $(SDCARD_MB)M $@
+	mpartition -I -c -b 32 -s 32 -h 64 -t $(SDCARD_MB) -a "z:"
+	mformat -v "piPXE" "z:"
+	mcopy -s $(sort $(filter-out firmware/kernel%,$(wildcard firmware/*))) "z:"
+	mcopy config.txt $(EFI_FD) edk2/License.txt "z:"
+	mmd "z:/efi" "z:/efi/boot"
+	mcopy $(IPXE_EFI) "z:/efi/boot/bootaa64.efi"
+	mcopy ipxe/COPYING* "z:"
+
+.PHONY : submodules firmware efi efi-basetools $(EFI_FD) ipxe $(IPXE_EFI) sdcard.img
 
 clean :
-	$(RM) -rf firmware Build
+	$(RM) -rf firmware Build sdcard.img
 	if [ -d $(IPXE_SRC) ] ; then $(MAKE) -C $(IPXE_SRC) clean ; fi
