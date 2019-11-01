@@ -1,7 +1,4 @@
-WGET		:= wget --quiet --timestamping --continue
-
-FWURL		:= https://raw.githubusercontent.com/raspberrypi/firmware
-FWFILES		:= LICENCE.broadcom bootcode.bin
+FW_URL		:= https://github.com/raspberrypi/firmware/branches/stable/boot
 
 EFI_BUILD	:= RELEASE
 EFI_ARCH	:= AARCH64
@@ -16,15 +13,17 @@ IPXE_SRC	:= ipxe/src
 IPXE_TGT	:= bin-arm64-efi/rpi.efi
 IPXE_EFI	:= $(IPXE_SRC)/$(IPXE_TGT)
 
-all : submodules fwfiles efi ipxe
+all : submodules firmware efi ipxe
 
 submodules :
 	git submodule update --init --recursive
 
-fwfiles : $(FWFILES)
-
-$(FWFILES) :
-	$(WGET) $(FWURL)/stable/boot/$@
+firmware :
+	if [ ! -e firmware ] ; then \
+		$(RM) -rf firmware-tmp ; \
+		svn export $(FW_URL) firmware-tmp && \
+		mv firmware-tmp firmware ; \
+	fi
 
 efi : $(EFI_FD)
 
@@ -41,9 +40,8 @@ ipxe : $(IPXE_EFI)
 $(IPXE_EFI) : submodules
 	$(MAKE) -C $(IPXE_SRC) CROSS=$(IPXE_CROSS) CONFIG=rpi $(IPXE_TGT)
 
-.PHONY : submodules fwfiles $(FWFILES) efi efi-basetools $(EFI_FD) \
-	ipxe $(IPXE_EFI)
+.PHONY : submodules firmware efi efi-basetools $(EFI_FD) ipxe $(IPXE_EFI)
 
 clean :
-	$(RM) -f $(FWFILES) Build
+	$(RM) -rf firmware Build
 	if [ -d $(IPXE_SRC) ] ; then $(MAKE) -C $(IPXE_SRC) clean ; fi
