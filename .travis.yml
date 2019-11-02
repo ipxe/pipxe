@@ -10,3 +10,12 @@ script:
   - docker run -i -t --name pipxe pipxe
   - docker cp pipxe:/opt/build/sdcard.img sdcard.img
   - docker container rm pipxe
+
+deploy:
+  provider: releases
+  api_key: $GITHUB_TOKEN
+  skip_cleanup: true
+  on:
+    tags: true
+  file:
+    - sdcard.img
