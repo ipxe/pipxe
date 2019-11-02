@@ -53,6 +53,9 @@ sdcard.img : firmware efi ipxe
 	mcopy $(IPXE_EFI) "z:/efi/boot/bootaa64.efi"
 	mcopy ipxe/COPYING* "z:"
 
+update:
+	git submodule foreach git pull origin master
+
 tag :
 	git tag v`git show -s --format='%ad' --date=short | tr -d -`
 
