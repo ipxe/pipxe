@@ -53,6 +53,9 @@ sdcard.img : firmware efi ipxe
 	mcopy $(IPXE_EFI) "z:/efi/boot/bootaa64.efi"
 	mcopy ipxe/COPYING* "z:"
 
+tag :
+	git tag v`git show -s --format='%ad' --date=short | tr -d -`
+
 .PHONY : submodules firmware efi efi-basetools $(EFI_FD) ipxe $(IPXE_EFI) sdcard.img
 
 clean :
