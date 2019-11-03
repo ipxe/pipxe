@@ -17,7 +17,9 @@ using a tool such as `dd` or [Etcher].
 3. Power on your Raspberry Pi.
 
 Within a few seconds you should see iPXE appear and begin booting from
-the network.
+the network:
+
+![Screenshot](screenshot.png)
 
 Building from source
 --------------------
