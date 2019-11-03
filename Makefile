@@ -16,7 +16,7 @@ IPXE_EFI	:= $(IPXE_SRC)/$(IPXE_TGT)
 SDCARD_MB	:= 32
 export MTOOLSRC	:= mtoolsrc
 
-all : sdcard.img
+all : sdcard sdcard.img sdcard.zip
 
 submodules :
 	git submodule update --init --recursive
@@ -43,15 +43,25 @@ ipxe : $(IPXE_EFI)
 $(IPXE_EFI) : submodules
 	$(MAKE) -C $(IPXE_SRC) CROSS=$(IPXE_CROSS) CONFIG=rpi $(IPXE_TGT)
 
-sdcard.img : firmware efi ipxe
+sdcard : firmware efi ipxe
+	$(RM) -rf sdcard
+	mkdir -p sdcard
+	cp -r $(sort $(filter-out firmware/kernel%,$(wildcard firmware/*))) \
+		sdcard/
+	cp config.txt $(EFI_FD) edk2/License.txt sdcard/
+	mkdir -p sdcard/efi/boot
+	cp $(IPXE_EFI) sdcard/efi/boot/bootaa64.efi
+	cp ipxe/COPYING* sdcard/
+
+sdcard.img : sdcard
 	truncate -s $(SDCARD_MB)M $@
 	mpartition -I -c -b 32 -s 32 -h 64 -t $(SDCARD_MB) -a "z:"
 	mformat -v "piPXE" "z:"
-	mcopy -s $(sort $(filter-out firmware/kernel%,$(wildcard firmware/*))) "z:"
-	mcopy config.txt $(EFI_FD) edk2/License.txt "z:"
-	mmd "z:/efi" "z:/efi/boot"
-	mcopy $(IPXE_EFI) "z:/efi/boot/bootaa64.efi"
-	mcopy ipxe/COPYING* "z:"
+	mcopy -s sdcard/* "z:"
+
+sdcard.zip : sdcard
+	$(RM) -f $@
+	( pushd $< ; zip -q -r ../$@ * ; popd )
 
 update:
 	git submodule foreach git pull origin master
@@ -59,8 +69,9 @@ update:
 tag :
 	git tag v`git show -s --format='%ad' --date=short | tr -d -`
 
-.PHONY : submodules firmware efi efi-basetools $(EFI_FD) ipxe $(IPXE_EFI) sdcard.img
+.PHONY : submodules firmware efi efi-basetools $(EFI_FD) ipxe $(IPXE_EFI) \
+	 sdcard sdcard.img
 
 clean :
-	$(RM) -rf firmware Build sdcard.img
+	$(RM) -rf firmware Build sdcard sdcard.img sdcard.zip
 	if [ -d $(IPXE_SRC) ] ; then $(MAKE) -C $(IPXE_SRC) clean ; fi
