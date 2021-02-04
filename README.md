@@ -29,8 +29,19 @@ build all of the required components and eventually generate the SD
 card image [sdcard.img].
 
 You will need various build tools installed, including a
-cross-compiling version of `gcc` for building AArch64 binaries.  See
-the [Dockerfile](Dockerfile) for hints on which packages to install.
+cross-compiling version of `gcc` for building AArch64 binaries.
+
+Fedora build tools:
+
+    sudo dnf install -y binutils gcc gcc-aarch64-linux-gnu \
+                        git-core iasl libuuid-devel make \
+                        mtools perl python subversion xz-devel
+
+Ubuntu build tools:
+
+    sudo apt install -y build-essential gcc-aarch64-linux-gnu \
+                        git iasl lzma-dev mtools perl python \
+                        subversion uuid-dev
 
 How it works
 ------------
