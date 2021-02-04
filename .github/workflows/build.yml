@@ -1,0 +1,72 @@
+name: Build
+
+on: push
+
+jobs:
+
+  build:
+    name: Build
+    runs-on: ubuntu-20.04
+    steps:
+
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Install packages
+        run: |
+          sudo apt update
+          sudo apt install -y -o Acquire::Retries=50 \
+                           gcc-aarch64-linux-gnu iasl mtools subversion \
+                           lzma-dev uuid-dev
+
+      - name: Sources (git)
+        run: |
+          make submodules
+
+      - name: Sources (subversion)
+        run: |
+          make firmware
+
+      - name: Build (EFI)
+        run: |
+          make efi
+
+      - name: Build (iPXE)
+        run: |
+          make ipxe -j 4
+
+      - name: SD card
+        run: |
+          make
+
+      - name: Create release
+        id: create_release
+        if: startsWith(github.event.ref, 'refs/tags/v')
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: ${{ github.ref }}
+
+      - name: Upload (sdcard.img)
+        if: startsWith(github.event.ref, 'refs/tags/v')
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_name: sdcard.img
+          asset_path: sdcard.img
+          asset_content_type: application/octet-stream
+
+      - name: Upload (sdcard.zip)
+        if: startsWith(github.event.ref, 'refs/tags/v')
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_name: sdcard.zip
+          asset_path: sdcard.zip
+          asset_content_type: application/zip
