@@ -16,6 +16,8 @@ IPXE_EFI	:= $(IPXE_SRC)/$(IPXE_TGT)
 SDCARD_MB	:= 32
 export MTOOLSRC	:= mtoolsrc
 
+SHELL		:= /bin/bash
+
 all : sdcard sdcard.img sdcard.zip
 
 submodules :
