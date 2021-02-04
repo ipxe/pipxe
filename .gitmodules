@@ -9,4 +9,4 @@
 	url = https://github.com/tianocore/edk2-non-osi.git
 [submodule "ipxe"]
 	path = ipxe
-	url = https://git.ipxe.org/ipxe.git
+	url = https://github.com/ipxe/ipxe.git
