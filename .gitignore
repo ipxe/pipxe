@@ -1,5 +1,7 @@
 Build/
 firmware/
+firmware-tmp/
 sdcard/
-sdcard.img
-sdcard.zip
+*.img
+*.zip
+*.cid

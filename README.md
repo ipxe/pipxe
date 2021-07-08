@@ -1,61 +1,22 @@
-piPXE - iPXE for the Raspberry Pi
-=================================
+# piPXE - iPXE for the Raspberry Pi
 
-[![Build](https://img.shields.io/github/workflow/status/ipxe/pipxe/Build)](https://github.com/ipxe/pipxe/actions?query=workflow%3ABuild+branch%3Amaster)
-[![Release](https://img.shields.io/github/v/release/ipxe/pipxe)](https://github.com/ipxe/pipxe/releases/latest)
+piPXE is a build of the [iPXE] network boot firmware for the [Raspberry].
 
-piPXE is a build of the [iPXE] network boot firmware for the
-[Raspberry Pi].
+## Learn More
 
-Quick start
------------
+How would you like to get started?
 
-1. Download [sdcard.img] and write it onto any blank micro SD card
-using a tool such as `dd` or [Etcher].
-
-2. Insert the micro SD card into your Raspberry Pi.
-
-3. Power on your Raspberry Pi.
-
-Within a few seconds you should see iPXE appear and begin booting from
-the network:
-
-![Screenshot](screenshot.png)
-
-Building from source
---------------------
-
-To build from source, clone this repository and run `make`.  This will
-build all of the required components and eventually generate the SD
-card image [sdcard.img].
-
-You will need various build tools installed, including a
-cross-compiling version of `gcc` for building AArch64 binaries.
-
-Fedora build tools:
-
-    sudo dnf install -y binutils gcc gcc-aarch64-linux-gnu \
-                        git-core iasl libuuid-devel make \
-                        mtools perl python subversion xz-devel
-
-Ubuntu build tools:
-
-    sudo apt install -y build-essential gcc-aarch64-linux-gnu \
-                        git iasl lzma-dev mtools perl python \
-                        subversion uuid-dev
-
-How it works
-------------
+### How it works
 
 The SD card image contains:
 
-* Broadcom [VC4 boot firmware]: `bootcode.bin` and related files
-* [TianoCore EDK2] UEFI firmware built for the [RPi3] platform: `RPI_EFI.fd`
+* [Firmware]: `bootcode.bin` and related files
+* [EDK2] UEFI firmware built for the [RPi] platform: `RPI_EFI.fd`
 * [iPXE] built for the `arm64-efi` platform: `/efi/boot/bootaa64.efi`
 
-The Raspberry Pi has a somewhat convoluted boot process in which the
-VC4 GPU is responsible for loading the initial executable ARM CPU
-code.  The flow of execution is approximately:
+The Raspberry Pi has a somewhat convoluted boot process in which the VC4 GPU is
+responsible for loading the initial executable ARM CPU code.  The flow of
+execution is approximately:
 
 1. The GPU code in the onboard boot ROM loads `bootcode.bin` from the SD card.
 2. The GPU executes `bootcode.bin` and loads `RPI_EFI.fd` from the SD card.
@@ -63,20 +24,69 @@ code.  The flow of execution is approximately:
 4. The CPU executes `RPI_EFI.fd` and loads `bootaa64.efi` from the SD card.
 5. The CPU executes `bootaa64.efi` (i.e. iPXE) to boot from the network.
 
-Licence
--------
+### Use
 
-Every component is under an open source licence.  See the individual
-subproject licensing terms for more details:
+Download disk image using [oras]:
+
+```bash
+oras pull ghcr.io/raballew/pipxe/pipxe:${GIT_REVISION} -a
+```
+
+Where:
+
+* `${GIT_REVISION}` -  Full `SHA-1 object name` from main branch, [SemVer]
+  compliant `tag` or `latest`
+
+You should now see a bunch of `*.img` files in your current working directory.
+Then write it onto any blank micro SD card, insert the micro SD card into your
+Raspberry Pi and power it on. Within a few seconds you should see iPXE appear
+and begin booting from the network.
+
+### Develop
+
+To build from source, clone this repository and run `make all`. This will build
+all of the required components and eventually generate the SD card image.
+
+You will need various build tools installed, including a cross-compiling version
+of `gcc` for building AArch64 binaries. See the [Containerfile](Containerfile)
+for hints on which packages to install. Or you might be to just build the disk
+image locally in a container:
+
+```bash
+podman build -t localhost/pipxe -f Containerfile .
+podman rm -i $(cat ${RASPI_VERSION}.cid)
+rm ${RASPI_VERSION}.cid
+podman run --cidfile ${RASPI_VERSION}.cid -e RASPI_VERSION=${RASPI_VERSION} -t localhost/pipxe
+podman cp $(cat ${RASPI_VERSION}.cid):/opt/build/sdcard.img ${RASPI_VERSION}.img
+```
+
+Where:
+
+* `${RASPI_VERSION}` - Either `RPi3` or `RPi4`
+
+## Code of Conduct
+
+The Rust [code of conduct](https://www.rust-lang.org/conduct.html) is adhered by
+the piPXE project.
+
+All contributors, community members, and visitors are expected to familiarize
+themselves with the code of conduct and to follow these standards in all
+piPXE-affiliated environments, which includes but is not limited to
+repositories, chats, and meetup events.
+
+## Licence
+
+Every component is under an open source licence.  See the individual subproject
+licensing terms for more details:
 
 * <https://github.com/raspberrypi/firmware/blob/master/boot/LICENCE.broadcom>
-* <https://github.com/tianocore/edk2/blob/master/Readme.md>
+* <https://github.com/tianocore/edk2/blob/master/License.txt>
 * <https://ipxe.org/licensing>
 
 [iPXE]: https://ipxe.org
-[Raspberry Pi]: https://www.raspberrypi.org
-[sdcard.img]: https://github.com/ipxe/pipxe/releases/latest/download/sdcard.img
-[Etcher]: https://www.balena.io/etcher
-[VC4 boot firmware]: https://github.com/raspberrypi/firmware/tree/master/boot
-[TianoCore EDK2]: https://github.com/tianocore/edk2
-[RPi3]: https://github.com/tianocore/edk2-platforms/tree/master/Platform/RaspberryPi/RPi3
+[Raspberry]: https://www.raspberrypi.org
+[oras]: https://github.com/oras-project/oras
+[SemVer]: https://semver.org/
+[Firmware]: https://github.com/raspberrypi/firmware/tree/master/boot
+[EDK2]: https://github.com/tianocore/edk2
+[RPi]: https://github.com/tianocore/edk2-platforms/tree/master/Platform/RaspberryPi/

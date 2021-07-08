@@ -1,0 +1,23 @@
+---
+jobs:
+  links:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - uses: gaurav-nelson/github-action-markdown-link-check@v1
+        with:
+          config-file: .github/workflows/markdown-config.json
+          use-quiet-mode: yes
+          use-verbose-mode: yes
+name: Markdown
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+    tags:
+      - '[0-9]+.[0-9]+.[0-9]+'
+  schedule:
+    - cron: 0 2 * * *

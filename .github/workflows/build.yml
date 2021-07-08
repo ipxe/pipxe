@@ -1,72 +1,98 @@
-name: Build
-
-on: push
-
+---
+env:
+  IMAGE_NAME: pipxe
 jobs:
-
-  build:
-    name: Build
-    runs-on: ubuntu-20.04
+  setup:
+    runs-on: ubuntu-latest
     steps:
-
-      - name: Check out code
-        uses: actions/checkout@v2
-
-      - name: Install packages
-        run: |
-          sudo apt update
-          sudo apt install -y -o Acquire::Retries=50 \
-                           gcc-aarch64-linux-gnu iasl mtools subversion \
-                           lzma-dev uuid-dev
-
-      - name: Sources (git)
-        run: |
-          make submodules
-
-      - name: Sources (subversion)
-        run: |
-          make firmware
-
-      - name: Build (EFI)
-        run: |
-          make efi
-
-      - name: Build (iPXE)
-        run: |
-          make ipxe -j 4
-
-      - name: SD card
-        run: |
-          make
-
-      - name: Create release
-        id: create_release
-        if: startsWith(github.event.ref, 'refs/tags/v')
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Checkout
+        uses: actions/checkout@v2.3.4
+      - name: Setup build environment
+        run: docker build . --file Containerfile --tag ${IMAGE_NAME}
+      - name: Save
+        run: docker save ${IMAGE_NAME} -o container.tar
+      - name: Upload
+        uses: actions/upload-artifact@v2
         with:
-          tag_name: ${{ github.ref }}
-          release_name: ${{ github.ref }}
-
-      - name: Upload (sdcard.img)
-        if: startsWith(github.event.ref, 'refs/tags/v')
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          name: container
+          path: container.tar
+  build:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download
+        uses: actions/download-artifact@v2
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_name: sdcard.img
-          asset_path: sdcard.img
-          asset_content_type: application/octet-stream
-
-      - name: Upload (sdcard.zip)
-        if: startsWith(github.event.ref, 'refs/tags/v')
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          name: container
+      - name: Load
+        run: docker load -i container.tar
+      - name: Build
+        run: |
+          id=${{ matrix.target }}
+          cidfile=${id}.cid
+          docker run -t -e RASPI_VERSION=${id} --cidfile ${cidfile} ${IMAGE_NAME}
+          cid=$(cat ${cidfile})
+          docker cp ${cid}:/opt/build/sdcard.img ./${id}.img
+      - name: Upload
+        uses: actions/upload-artifact@v2
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_name: sdcard.zip
-          asset_path: sdcard.zip
-          asset_content_type: application/zip
+          name: images
+          path: '*.img'
+    strategy:
+      matrix:
+        target:
+          - RPi3
+          - RPi4
+  push:
+    if: github.event_name == 'push'
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download
+        uses: actions/download-artifact@v2
+        with:
+          name: images
+      - name: Authenticate
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+      - name: Publish
+        run: |
+          IMAGE_ID=ghcr.io/${{ github.repository }}/$IMAGE_NAME
+
+          # Change all uppercase to lowercase
+          IMAGE_ID=$(echo ${IMAGE_ID} | tr '[A-Z]' '[a-z]')
+
+          # Strip git ref prefix from version
+          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+          if [[ "${{ github.ref }}" != *"refs/tags/"* ]]; then
+            [ "${VERSION}" == "main" ] && VERSION=latest
+          fi
+
+          echo IMAGE_ID=${IMAGE_ID}
+          echo VERSION=${VERSION}
+
+          USER=$(echo "${GITHUB_REPOSITORY}" | cut -d ";" -f 1 | tr '[A-Z]' '[a-z]')
+          REPOSITORY=$(echo "${GITHUB_REPOSITORY}" | cut -d ";" -f 2 | tr '[A-Z]' '[a-z]')
+
+          echo USER=${USER}
+          echo REPOSITORY=${REPOSITORY}
+
+          docker run -t --rm -v ${HOME}/.docker:/.docker -v $(pwd):/workspace ghcr.io/oras-project/oras:v0.12.0 push \
+            ${IMAGE_ID}:${{ github.sha }} \
+            --config /.docker/config.json \
+            --manifest-config /dev/null:application/vnd.${USER}.${REPOSITORY}.config \
+            ./:application/vnd.${USER}.${REPOSITORY}.layer.v1+tar
+          docker run -t --rm -v ${HOME}/.docker:/.docker -v $(pwd):/workspace ghcr.io/oras-project/oras:v0.12.0 push \
+            ${IMAGE_ID}:${VERSION} \
+            --config /.docker/config.json \
+            --manifest-config /dev/null:application/vnd.${USER}.${REPOSITORY}.config \
+            ./:application/vnd.${USER}.${REPOSITORY}.layer.v1+tar
+name: Build
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+    tags:
+      - '[0-9]+.[0-9]+.[0-9]+'
