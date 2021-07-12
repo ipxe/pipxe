@@ -20,6 +20,8 @@ jobs:
         run: |
           make update
       - name: Create commit
+        id: create-commit
+        continue-on-error: true
         run: |
           if [[ `git status --porcelain --untracked-files=no` ]]; then
             git config user.name '${{ github.actor }}'
@@ -27,9 +29,10 @@ jobs:
             git add -A
             git commit -m "submodules: bump to latest version"
           else
-            return 1
+            exit 1
           fi
       - name: Create pull request
+        if: steps.create-commit.outcome == 'success' && steps.create-commit.conclusion == 'success'
         uses: peter-evans/create-pull-request@v3
         with:
           author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>

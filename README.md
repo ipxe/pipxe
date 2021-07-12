@@ -15,7 +15,7 @@ The SD card image contains:
 * [iPXE] built for the `arm64-efi` platform: `/efi/boot/bootaa64.efi`
 
 The Raspberry Pi has a somewhat convoluted boot process in which the VC4 GPU is
-responsible for loading the initial executable ARM CPU code.  The flow of
+responsible for loading the initial executable ARM CPU code. The flow of
 execution is approximately:
 
 1. The GPU code in the onboard boot ROM loads `bootcode.bin` from the SD card.
@@ -26,10 +26,10 @@ execution is approximately:
 
 ### Use
 
-Download disk image using [oras]:
+Download the disk image using [oras]:
 
 ```bash
-oras pull ghcr.io/raballew/pipxe/pipxe:${GIT_REVISION} -a
+podman run -it --rm -v $(pwd):/workspace:Z ghcr.io/oras-project/oras:v0.12.0 pull ghcr.io/raballew/pipxe/pipxe:${GIT_REVISION} -a
 ```
 
 Where:
@@ -38,9 +38,10 @@ Where:
   compliant `tag` or `latest`
 
 You should now see a bunch of `*.img` files in your current working directory.
-Then write it onto any blank micro SD card, insert the micro SD card into your
-Raspberry Pi and power it on. Within a few seconds you should see iPXE appear
-and begin booting from the network.
+Select the appropriate one for your hardware and write it onto any blank micro
+SD card. Then insert the micro SD card into your Raspberry Pi and power it on.
+Within a few seconds you should see iPXE appear and begin booting from the
+network.
 
 ### Develop
 
