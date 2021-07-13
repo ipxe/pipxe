@@ -22,6 +22,7 @@ all : sdcard sdcard.img sdcard.zip
 
 submodules :
 	git submodule update --init --recursive
+	./patch.sh $(RASPI_VERSION)
 
 firmware :
 	if [ ! -e firmware ] ; then \

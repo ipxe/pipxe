@@ -6,6 +6,17 @@ piPXE is a build of the [iPXE] network boot firmware for the [Raspberry].
 
 How would you like to get started?
 
+### Limitations
+
+* Depending on your target, the patches described in [patch.sh](patch.sh) are
+  applied
+* If you target Raspberry Pi 4, you need to use an OS patched for direct memory
+  access which in Linux, requires kernel 5.8 or later. This is the result of a
+  hardware bug in the Broadcom CPU that powers the device.
+* You will no get SD or wireless support in Linux, unless you use a recent
+  Linux kernel (version 5.12 or later) or one into which the 5.12 fixes have
+  been backported as well as a recent Linux wireless firmware package.
+
 ### How it works
 
 The SD card image contains:
