@@ -19,9 +19,9 @@ jobs:
       - name: Update submodules
         run: |
           make update
-      - name: Create commit
+      - continue-on-error: true
         id: create-commit
-        continue-on-error: true
+        name: Create commit
         run: |
           if [[ `git status --porcelain --untracked-files=no` ]]; then
             git config user.name '${{ github.actor }}'
@@ -31,8 +31,8 @@ jobs:
           else
             exit 1
           fi
-      - name: Create pull request
-        if: steps.create-commit.outcome == 'success' && steps.create-commit.conclusion == 'success'
+      - if: steps.create-commit.outcome == 'success' && steps.create-commit.conclusion == 'success'
+        name: Create pull request
         uses: peter-evans/create-pull-request@v3
         with:
           author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
