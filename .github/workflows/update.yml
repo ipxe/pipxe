@@ -19,22 +19,10 @@ jobs:
       - name: Update submodules
         run: |
           make update
-      - continue-on-error: true
-        id: create-commit
-        name: Create commit
-        run: |
-          if [[ `git status --porcelain --untracked-files=no` ]]; then
-            git config user.name '${{ github.actor }}'
-            git config user.email '${{ github.actor }}@users.noreply.github.com'
-            git add -A
-            git commit -m "submodules: bump to latest version"
-          else
-            exit 1
-          fi
-      - if: steps.create-commit.outcome == 'success' && steps.create-commit.conclusion == 'success'
-        name: Create pull request
+      - name: Create pull request
         uses: peter-evans/create-pull-request@v3
         with:
+          committer: GitHub <noreply@github.com>
           author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
           body: |
             Update submodules by bumping them to the latest revision

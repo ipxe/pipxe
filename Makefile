@@ -66,11 +66,8 @@ sdcard.zip : sdcard
 	$(RM) -f $@
 	( pushd $< ; zip -q -r ../$@ * ; popd )
 
-update:
+update :
 	git submodule foreach git pull origin master
-
-tag :
-	git tag v`git show -s --format='%ad' --date=short | tr -d -`
 
 .PHONY : submodules firmware efi efi-basetools $(EFI_FD) ipxe $(IPXE_EFI) sdcard sdcard.img
 
