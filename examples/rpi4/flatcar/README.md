@@ -5,9 +5,7 @@ Download the desired `arm64` version of Flatcar Container Linux from the
 need the following files:
 
 * flatcar_production_pxe_image.cpio.gz
-* flatcar_production_pxe_image.cpio.gz.sig
 * flatcar_production_pxe.vmlinuz
-* flatcar_production_pxe.vmlinuz.sig
 
 Make sure that the `*.sig` file content matches the signature of the other
 corresponding files.
