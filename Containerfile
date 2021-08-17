@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM docker.io/ubuntu:20.04
 
 RUN apt update && \
 	apt install -y -o Acquire::Retries=50 \
