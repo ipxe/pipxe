@@ -1,0 +1,26 @@
+{
+  "ignition": { "version": "2.2.0" },
+  "systemd": {
+    "units": [
+      {
+        "name": "pigpiod.service",
+        "enabled": true
+      },
+      {
+        "name": "proc-cpuinfo.mount",
+        "enable": true,
+        "contents": "[Mount]\nWhat=/etc/fake-cpuinfo\nWhere=/proc/cpuinfo\nType=none\nOptions=bind\n\n[Install]\nWantedBy=local-fs.target"
+      }
+    ]
+  },
+  "storage": {
+    "files": [{
+      "filesystem": "root",
+      "path": "/etc/fake-cpuinfo",
+      "mode": 444,
+      "contents": {
+        "source": "data:application/octet-stream,Revision%09%3A%20c03111%0A%0A"
+      }
+    }]
+  }
+}

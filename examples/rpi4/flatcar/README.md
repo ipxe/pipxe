@@ -7,9 +7,6 @@ need the following files:
 * flatcar_production_pxe_image.cpio.gz
 * flatcar_production_pxe.vmlinuz
 
-Make sure that the `*.sig` file content matches the signature of the other
-corresponding files.
-
 Now, place all files above and [flatcar.ipxe](flatcar.ipxe) in the root
 directory of your `tftp` server. Also prepare your `dhcp` and `tftp` servers
 accordingly, so that the Raspberry Pi once booted loads
