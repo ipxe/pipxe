@@ -22,6 +22,8 @@ all : sdcard sdcard.img sdcard.zip
 
 submodules :
 	git submodule update --init --recursive
+
+patches :
 	./patch.sh $(RASPI_VERSION)
 
 firmware :
@@ -33,17 +35,17 @@ firmware :
 
 efi : $(EFI_FD)
 
-efi-basetools : submodules
+efi-basetools : submodules patches
 	$(MAKE) -C edk2/BaseTools
 
-$(EFI_FD) : submodules efi-basetools
+$(EFI_FD) : submodules patches efi-basetools
 	. ./edksetup.sh && \
 	build -b $(EFI_BUILD) -a $(EFI_ARCH) -t $(EFI_TOOLCHAIN) \
 		-p $(EFI_DSC) $(EFI_FLAGS)
 
 ipxe : $(IPXE_EFI)
 
-$(IPXE_EFI) : submodules
+$(IPXE_EFI) : submodules patches
 	$(MAKE) -C $(IPXE_SRC) CROSS=$(IPXE_CROSS) CONFIG=rpi $(IPXE_TGT)
 
 sdcard : firmware efi ipxe
@@ -69,7 +71,7 @@ sdcard.zip : sdcard
 update :
 	git submodule foreach git pull origin master
 
-.PHONY : submodules firmware efi efi-basetools $(EFI_FD) ipxe $(IPXE_EFI) sdcard sdcard.img
+.PHONY : submodules patches firmware efi efi-basetools $(EFI_FD) ipxe $(IPXE_EFI) sdcard sdcard.img
 
 clean :
 	$(RM) -rf firmware Build sdcard sdcard.img sdcard.zip
