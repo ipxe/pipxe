@@ -34,7 +34,7 @@ jobs:
             security
           signoff: false
           title: '[Submodules] Update all submodules to latest version'
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.REPO_SCOPED_TOKEN }}
 name: Update
 on:
   schedule:
