@@ -35,7 +35,7 @@ firmware :
 
 efi : $(EFI_FD)
 
-efi-basetools : submodules patches
+efi-basetools : submodules
 	$(MAKE) -C edk2/BaseTools
 
 $(EFI_FD) : submodules patches efi-basetools
@@ -69,7 +69,10 @@ sdcard.zip : sdcard
 	( pushd $< ; zip -q -r ../$@ * ; popd )
 
 update : submodules
-	git submodule foreach git pull origin master
+	git -C edk2/ checkout $(shell curl --silent "https://api.github.com/repos/tianocore/edk2/releases/latest" | jq -r .tag_name)
+	git -C edk2-non-osi/ pull origin master
+	git -C edk2-platforms/ pull origin master
+	git -C ipxe/ pull origin master
 
 .PHONY : submodules patches firmware efi efi-basetools $(EFI_FD) ipxe $(IPXE_EFI) sdcard sdcard.img
 

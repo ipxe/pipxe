@@ -4,7 +4,7 @@ RUN apt update && \
 	apt install -y -o Acquire::Retries=50 \
 		build-essential gcc-aarch64-linux-gnu \
 		git iasl lzma-dev mtools perl python \
-		subversion uuid-dev zip unzip
+		subversion uuid-dev zip unzip curl jq
 
 WORKDIR /opt/build
 
