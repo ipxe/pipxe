@@ -3,7 +3,7 @@ FROM docker.io/ubuntu:20.04
 RUN apt update && \
 	apt install -y -o Acquire::Retries=50 \
 		build-essential gcc-aarch64-linux-gnu \
-		git iasl lzma-dev mtools perl python python3 \
+		git iasl lzma-dev mtools perl python3 \
 		subversion uuid-dev zip unzip
 
 WORKDIR /opt/build
