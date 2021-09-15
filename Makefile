@@ -35,7 +35,7 @@ firmware :
 
 efi : $(EFI_FD)
 
-efi-basetools : submodules
+efi-basetools : submodules patches
 	$(MAKE) -C edk2/BaseTools
 
 $(EFI_FD) : submodules patches efi-basetools
