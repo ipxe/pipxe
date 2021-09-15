@@ -68,7 +68,7 @@ sdcard.zip : sdcard
 	$(RM) -f $@
 	( pushd $< ; zip -q -r ../$@ * ; popd )
 
-update : submodules
+update :
 	git -C edk2/ checkout $(shell curl --silent "https://api.github.com/repos/tianocore/edk2/releases/latest" | jq -r .tag_name)
 	git -C edk2-non-osi/ pull origin master
 	git -C edk2-platforms/ pull origin master
