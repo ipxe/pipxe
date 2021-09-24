@@ -1,8 +1,8 @@
 # Flatcar Container Linux
 
 Download the desired `arm64` version of Flatcar Container Linux from the
-[official mirror](https://www.flatcar-linux.org/). You will
-need the following files:
+[official mirror](https://www.flatcar-linux.org/). You will need the following
+files:
 
 * flatcar_production_pxe_image.cpio.gz
 * flatcar_production_pxe.vmlinuz
