@@ -12,10 +12,6 @@ echo Asset........ ${smbios/asset}
 echo UUID......... ${smbios/uuid}
 echo Serial....... ${smbios/serial}
 
-# Show the available network interfaces.
-echo Network interfaces:
-ifstat
-
 echo Configuring net0 ${net0/mac} (${net0/chip}) from dhcp...
 :retry_ifconf
 ifconf --configurator dhcp net0 || goto retry_ifconf

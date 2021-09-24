@@ -5,3 +5,6 @@ sdcard/
 *.img
 *.zip
 *.cid
+examples/rpi4/fcos/fedora-coreos-*
+examples/rpi4/fcos/*.ign
+
