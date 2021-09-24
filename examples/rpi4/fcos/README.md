@@ -21,7 +21,7 @@ Now render the ignition file:
 
 ```bash
 podman run --rm -v ./:/data:z quay.io/coreos/fcct:v0.13.1 --pretty --strict -d /data/ /data/fcos.fcc -o /data/fcos.ign
-podman run --rm -i quay.io/coreos/ignition-validate:v2.12.0 - < examples/rpi4/fcos/fcos.ign
+podman run --rm -i quay.io/coreos/ignition-validate:v2.12.0 - < ./fcos.ign
 ```
 
 Now, place [fcos.ipxe](fcos.ipxe) in the root directory of your `tftp` server.
