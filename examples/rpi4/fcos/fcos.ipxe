@@ -25,6 +25,6 @@ echo Domain....... ${domain}
 echo Next Server.. ${next-server}
 echo Filename..... ${filename}
 
-kernel http://${next-server}/fedora-coreos-live-kernel-aarch64 initrd=main coreos.live.rootfs_url=http://${next-server}/fedora-coreos-live-rootfs.aarch64.img ignition.firstboot ignition.platform.id=metal ignition.config.url=http://${next-server}/fcos.ign systemd.unified_cgroup_hierarchy=0
+kernel http://${next-server}/fedora-coreos-live-kernel-aarch64 initrd=main coreos.live.rootfs_url=http://${next-server}/fedora-coreos-live-rootfs.aarch64.img ignition.firstboot ignition.platform.id=metal systemd.unified_cgroup_hierarchy=0
 initrd --name main http://${next-server}/fedora-coreos-live-initramfs.aarch64.img
 boot

@@ -15,6 +15,8 @@ case $target in
   RPi4)
     # Set RAMLimit to >3GB, requires OS patched for DMA (e.g. Linux kernel >5.8)
     sed -i 's/gRaspberryPiTokenSpaceGuid.PcdRamLimitTo3GB|L"RamLimitTo3GB"|gConfigDxeFormSetGuid|0x0|1/gRaspberryPiTokenSpaceGuid.PcdRamLimitTo3GB|L"RamLimitTo3GB"|gConfigDxeFormSetGuid|0x0|0/g' edk2-platforms/Platform/RaspberryPi/RPi4/RPi4.dsc
+    # Use device tree system table mode for GPIO support
+    sed -i 's/gRaspberryPiTokenSpaceGuid.PcdSystemTableMode|L"SystemTableMode"|gConfigDxeFormSetGuid|0x0|0/gRaspberryPiTokenSpaceGuid.PcdSystemTableMode|L"SystemTableMode"|gConfigDxeFormSetGuid|0x0|2/g' edk2-platforms/Platform/RaspberryPi/RPi4/RPi4.dsc
     ;;
 
   *)

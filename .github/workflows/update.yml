@@ -16,7 +16,7 @@ jobs:
       - name: Sources (git)
         run: |
           make submodules
-      - name: Update submodules
+      - name: Update dependencies
         run: |
           make update
       - name: Create pull request
@@ -25,15 +25,15 @@ jobs:
           committer: GitHub <noreply@github.com>
           author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
           body: |
-            Update submodules by bumping them to the latest revision
-          branch: update-submodules
-          commit-message: 'submodules: bump to latest version'
+            Update dependencies by bumping them to the latest version
+          branch: update-dependencies
+          commit-message: 'dependencies: bump to latest version'
           delete-branch: true
           draft: false
           labels: |
             security
           signoff: false
-          title: '[Submodules] Update all submodules to latest version'
+          title: '[dependencies] Update dependencies to latest version'
           token: ${{ secrets.REPO_SCOPED_TOKEN }}
 name: Update
 on:
