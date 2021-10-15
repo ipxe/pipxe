@@ -16,6 +16,10 @@ How would you like to get started?
 * You will not get SD or wireless support in Linux, unless you use a recent
   Linux kernel (version 5.12 or later) or one into which the 5.12 fixes have
   been backported as well as a recent Linux wireless firmware package.
+* There is currently a bug while using device tree mode in
+  [edk2-platform](https://edk2.groups.io/g/devel/topic/86014858#81375) that
+  prevents the proper usage of USB devices, hence OS installation to disk is not
+  possible at the moment
 
 ### How it works
 
@@ -88,7 +92,7 @@ repositories, chats, and meetup events.
 
 ## Licence
 
-Every component is under an open source licence.  See the individual subproject
+Every component is under an open source licence. See the individual subproject
 licensing terms for more details:
 
 * <https://github.com/raspberrypi/firmware/blob/master/boot/LICENCE.broadcom>
