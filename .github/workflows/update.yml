@@ -33,7 +33,7 @@ jobs:
           labels: |
             security
           signoff: false
-          title: '[dependencies] Update dependencies to latest version'
+          title: 'dependencies: Update dependencies to latest version'
           token: ${{ secrets.REPO_SCOPED_TOKEN }}
 name: Update
 on:
