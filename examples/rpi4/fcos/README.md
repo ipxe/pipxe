@@ -9,8 +9,6 @@ podman run --pull=always --rm -v ${PWD}:/data -w /data quay.io/coreos/coreos-ins
 mv fedora-coreos-*-live-initramfs.aarch64.img fedora-coreos-live-initramfs.aarch64.img
 mv fedora-coreos-*-live-rootfs.aarch64.img fedora-coreos-live-rootfs.aarch64.img
 mv fedora-coreos-*-live-kernel-aarch64 fedora-coreos-live-kernel-aarch64.gz
-# piPXE uses EFI which only supports uncompressed kernel artifacts
-gzip -d fedora-coreos-live-kernel-aarch64.gz
 ```
 
 Now, place [fcos.ipxe](fcos.ipxe) in the root directory of your `tftp` server.

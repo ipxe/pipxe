@@ -6,6 +6,9 @@ target="$1"
 
 echo "Patching target: ${target}"
 
+# Enable GZIP image support
+sed -i 's/\/\/#define.*IMAGE_GZIP.*/#define IMAGE_GZIP/' ipxe/src/config/general.h
+
 case $target in
 
   RPi3)

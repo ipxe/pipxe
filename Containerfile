@@ -1,10 +1,9 @@
-FROM docker.io/ubuntu:20.04
+FROM registry.fedoraproject.org/fedora-minimal:33
 
-RUN apt update && \
-	apt install -y -o Acquire::Retries=50 \
-		build-essential gcc-aarch64-linux-gnu \
-		git iasl lzma-dev mtools perl python python3 \
-		subversion uuid-dev zip unzip
+RUN microdnf update -y && microdnf install -y \
+		binutils gcc gcc-aarch64-linux-gnu \
+        iasl libuuid-devel make \
+        mtools perl python subversion xz-devel tar git
 
 WORKDIR /opt/build
 

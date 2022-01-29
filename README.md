@@ -49,10 +49,62 @@ Where:
   compliant `tag` or `latest`
 
 You should now see a bunch of `*.img` files in your current working directory.
-Select the appropriate one for your hardware and write it onto any blank micro
-SD card. Then insert the micro SD card into your Raspberry Pi and power it on.
-Within a few seconds you should see iPXE appear and begin booting from the
-network.
+
+### PXE Chainloading
+
+This configuration only works with Raspberry Pi 4's. In the EEPROM adjust the
+[BOOT_ORDER
+configuration](https://www.raspberrypi.com/documentation/computers/raspberry-pi.html#raspberry-pi-4-bootloader-configuration)
+in the bootloader to include PXE booting from the network. Shut down your
+Raspberry Pi.
+
+First inspect the `RPi4.img`:
+
+```bash
+fdisk -l RPi4.img
+
+Disk RPi4.img: 32 MiB, 33554432 bytes, 65536 sectors
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disklabel type: dos
+Disk identifier: 0x00000000
+
+Device     Boot Start   End Sectors Size Id Type
+RPi4.img1  *       32 65535   65504  32M  6 FAT16
+```
+
+As shown above, each sectors has a size of 512 bytes and the position of the
+start block is 32. Hence, the offset for mounting the image is 512 * 32 = 16384
+bytes. Then mount the previously downloaded `RPi4.img` into your TFTP server
+root directory.
+
+```bash
+mkdir -p $TFTP_ROOT_DIR
+mount -v -o offset=$OFFSET RPi4.img $TFTP_ROOT_DIR
+```
+
+Where:
+
+* `$TFTP_ROOT_DIR` - The TFTP server directory.
+* `$OFFSET` - Offset e.g. 16384
+
+Now setup your DHCP server to let the Raspberry Pi perform its standard network
+boot with the aforementioned TFTP server. The device will identify itself with
+vendor class `PXEClient:Arch:00000:UNDI:002001`. Different versions of Raspberry
+Pi's might use different vendor classes at this stage. Make sure to adapt it too
+your needs. Set the boot file to the built iPXE EFI firmware. This should be
+located at `$TFTP_ROOT_DIR/efi/boot/bootaa64.efi`. Now the device will identify
+itself with the slightly different vendor class
+`PXEClient:Arch:00011:UNDI:003000`. Use this to setup the iPXE process after
+chainloading piPXE. Power on your Raspberry Pi.
+
+### SD Card
+
+This configuration works with both, Raspberry Pi 3's and 4's. Select the
+appropriate one for your hardware and write it onto any blank micro SD card.
+Then insert the micro SD card into your Raspberry Pi and power it on. Within a
+few seconds you should see iPXE appear and begin booting from the network.
 
 ### Develop
 
@@ -86,9 +138,9 @@ themselves with the code of conduct and to follow these standards in all
 piPXE-affiliated environments, which includes but is not limited to
 repositories, chats, and meetup events.
 
-## Licence
+## License
 
-Every component is under an open source licence. See the individual subproject
+Every component is under an open source license. See the individual subproject
 licensing terms for more details:
 
 * <https://github.com/raspberrypi/firmware/blob/master/boot/LICENCE.broadcom>
