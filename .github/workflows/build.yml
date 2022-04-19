@@ -20,7 +20,7 @@ jobs:
           cid=$(cat ${cidfile})
           docker cp ${cid}:/opt/build/sdcard.img ./${id}.img
       - name: Upload
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: images
           path: '*.img'
@@ -82,7 +82,7 @@ jobs:
       - name: Save
         run: docker save ${IMAGE_NAME} -o container.tar
       - name: Upload
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: container
           path: container.tar
