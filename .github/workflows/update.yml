@@ -20,7 +20,7 @@ jobs:
         run: |
           make update
       - name: Create pull request
-        uses: peter-evans/create-pull-request@v4.0.3
+        uses: peter-evans/create-pull-request@v4.0.4
         with:
           committer: GitHub <noreply@github.com>
           author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
