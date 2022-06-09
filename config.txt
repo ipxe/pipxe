@@ -6,3 +6,8 @@ uart_2ndstage=1
 armstub=RPI_EFI.fd
 device_tree_address=0x1f0000
 device_tree_end=0x200000
+
+# SG Electronic Systems Ethernet Dual Shield V 1.1 based on ENC28J60 SPI controller
+dtoverlay=spi1-1cs,cs0_pin=18
+dtoverlay=sgs_enc28j60-spi1.dtbo,int_pin=25
+dtoverlay=enc28j60,int_pin=22
