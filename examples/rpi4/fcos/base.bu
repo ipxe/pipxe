@@ -1,0 +1,28 @@
+variant: fcos
+version: 1.4.0
+systemd:
+  units:
+    - name: require-kvc-simple-kmod.service
+      enabled: true
+      contents: |
+        [Unit]
+        Requires=kmods-via-containers@simple-kmod.service
+        [Service]
+        Type=oneshot
+        ExecStart=/usr/bin/true
+        [Install]
+        WantedBy=multi-user.target
+storage:
+  disks:
+    - device: /dev/sda
+      wipe_table: true
+      partitions:
+        - number: 1
+          label: var
+  filesystems:
+    - path: /var
+      device: /dev/disk/by-partlabel/var
+      format: btrfs
+      wipe_filesystem: true
+      label: var
+      with_mount_unit: true
