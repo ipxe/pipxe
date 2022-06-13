@@ -7,6 +7,7 @@ armstub=RPI_EFI.fd
 device_tree_address=0x1f0000
 device_tree_end=0x200000
 
+# RS485 CAN HAT
 dtparam=audio=on
 dtparam=i2c_arm=on
 dtparam=spi=on
