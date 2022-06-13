@@ -10,3 +10,12 @@
 [submodule "ipxe"]
 	path = ipxe
 	url = https://github.com/ipxe/ipxe.git
+[submodule "examples/rpi4/fcos/kmods-via-containers"]
+	path = examples/rpi4/fcos/kmods-via-containers
+	url = https://github.com/raballew/kmods-via-containers
+[submodule "examples/rpi4/fcos/kvc-simple-kmod"]
+	path = examples/rpi4/fcos/kvc-simple-kmod
+	url = https://github.com/raballew/kvc-simple-kmod
+[submodule "examples/rpi4/fcos/filetranspiler"]
+	path = examples/rpi4/fcos/filetranspiler
+	url = https://github.com/raballew/filetranspiler

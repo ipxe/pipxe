@@ -6,3 +6,8 @@ uart_2ndstage=1
 armstub=RPI_EFI.fd
 device_tree_address=0x1f0000
 device_tree_end=0x200000
+
+dtparam=audio=on
+dtparam=i2c_arm=on
+dtparam=spi=on
+dtoverlay=mcp2515-can0,oscillator=12000000,interrupt=25
