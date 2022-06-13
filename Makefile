@@ -32,7 +32,6 @@ firmware :
 		svn export $(FW_URL) firmware-tmp && \
 		mv firmware-tmp firmware ; \
 	fi
-	cp -r overlays/* firmware/overlays/
 
 efi : $(EFI_FD)
 

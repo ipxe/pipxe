@@ -57,4 +57,17 @@ cd ..
 podman run --rm -ti -v ${PWD}:/srv:z -v ${FAKEROOT}:/fakeroot:z localhost/filetranspiler:latest -i base.ign -f /fakeroot > fcos.ign
 ```
 
+Now we can use this ignition config to start a Fedora CoreOS or RHEL CoreOS node
+and see the `kmods-via-containers@simple-kmod.service` and the kernel modules
+associated with `simple-kmods` get loaded.
+
+You can check the modules are loaded with:
+
+```bash
+lsmod | grep simple
+
+simple_procfs_kmod     20480  0
+simple_kmod            16384  0
+```
+
 [oras]: https://github.com/oras-project/oras

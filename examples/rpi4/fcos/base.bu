@@ -7,9 +7,12 @@ systemd:
       contents: |
         [Unit]
         Requires=kmods-via-containers@simple-kmod.service
+        After=network-online.target
+        Wants=network-online.target
         [Service]
         Type=oneshot
         ExecStart=/usr/bin/true
+        TimeoutSec=1800
         [Install]
         WantedBy=multi-user.target
 storage:
