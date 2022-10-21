@@ -69,5 +69,3 @@ lsmod | grep simple
 simple_procfs_kmod     20480  0
 simple_kmod            16384  0
 ```
-
-[oras]: https://github.com/oras-project/oras
