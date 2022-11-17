@@ -267,7 +267,7 @@ adapt it too your needs. Once the chainloading happened the device will identify
 itself with the slightly different vendor class
 `PXEClient:Arch:00011:UNDI:003000`. Use this to setup the iPXE process after
 chainloading piPXE. A sample
-[dnsmasq.conf](/examples/rpi4/pxe-chainloading/dnsmasq.conf) can be found in the
+[dnsmasq.conf](examples/rpi4/pxe-chainloading/dnsmasq.conf) can be found in the
 examples directory.
 
 > Even though the chainloading works is usage is quite limited, since as of now
