@@ -1,5 +1,4 @@
 Build/
 firmware/
 sdcard/
-sdcard.img
-sdcard.zip
+outs/*
