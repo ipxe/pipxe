@@ -6,38 +6,80 @@ jobs:
 
   build:
     name: Build
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
 
       - name: Check out code
         uses: actions/checkout@v2
 
+      - name: "mtools hack (for ubuntu 22.04): set apt default-release to DISTRIB_CODENAME from lsb-release"
+        run: |
+          echo "Distrib Codename: $(sed -r -n 's/DISTRIB_CODENAME=(.*)/\1/p'  /etc/lsb-release)"
+          FILE=$(printf 'APT\n{\n  Default-Release "%s";\n}\n'   "$(sed -r -n 's/DISTRIB_CODENAME=(.*)/\1/p'  /etc/lsb-release)" )
+          echo "$FILE" | sudo dd of=/etc/apt/apt.conf.d/01-default-release
+
+      - name: "mtools hack (for ubuntu 22.04): add apt source for noble"
+        run: |
+          FILE=$(printf '%s\ndeb http://security.ubuntu.com/ubuntu noble main\n'  "$(cat /etc/apt/sources.list)" )
+          echo "$FILE" | sudo dd of=/etc/apt/sources.list
+
+      - name: "mtools hack (for ubuntu 22.04): mtools package-pin to noble"
+        run: |
+          FILE=$(printf 'Package: mtools\nPin: release n=noble\nPin-Priority: 995\n')
+          echo "$FILE" | sudo dd of=/etc/apt/preferences.d/01-mtools
+
+
+      #- name: python hack (for ubuntu 22.04): ensure python exists in PATH as symlink to python3
+      #  run: sudo  ln -sf $(which python3)  $(which python3 | sed 's/3//g')
+
+
       - name: Install packages
         run: |
           sudo apt update
           sudo apt install -y -o Acquire::Retries=50 \
-                           gcc-aarch64-linux-gnu iasl mtools subversion \
-                           lzma-dev uuid-dev
+                           gcc-aarch64-linux-gnu iasl mtools \
+                           lzma-dev uuid-dev zip
 
       - name: Sources (git)
         run: |
           make submodules
 
-      - name: Sources (subversion)
+      - name: Sources (git sparce-checkout)
         run: |
           make firmware
 
-      - name: Build (EFI)
-        run: |
-          make efi
 
-      - name: Build (iPXE)
+      - name: Build (EFI) (rpi3)
         run: |
-          make ipxe -j 4
+          make efi -e RPI_MAJ_VER=3
 
-      - name: SD card
+      - name: Build (iPXE) (rpi3)
         run: |
-          make
+          make ipxe -j 4 -e RPI_MAJ_VER=3
+
+      - name: SD card (rpi3)
+        run: |
+          make -e RPI_MAJ_VER=3
+
+
+
+      - name: Build (EFI) (rpi4)
+        run: |
+          make efi -e RPI_MAJ_VER=4
+
+      - name: Build (iPXE) (rpi4)
+        run: |
+          make ipxe -j 4 -e RPI_MAJ_VER=4
+
+      - name: SD card (rpi4)
+        run: |
+          make -e RPI_MAJ_VER=4
+
+
+
+
+
+
 
       - name: Create release
         id: create_release
@@ -49,24 +91,54 @@ jobs:
           tag_name: ${{ github.ref }}
           release_name: ${{ github.ref }}
 
-      - name: Upload (sdcard.img)
+
+
+
+      - name: Upload (sdcard_rpi3.img)
         if: startsWith(github.event.ref, 'refs/tags/v')
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_name: sdcard.img
-          asset_path: sdcard.img
+          asset_name: sdcard_rpi3.img
+          asset_path: sdcard_rpi3.img
           asset_content_type: application/octet-stream
 
-      - name: Upload (sdcard.zip)
+
+      - name: Upload (sdcard_rpi3.zip)
         if: startsWith(github.event.ref, 'refs/tags/v')
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_name: sdcard.zip
-          asset_path: sdcard.zip
+          asset_name: sdcard_rpi3.zip
+          asset_path: sdcard_rpi3.zip
+          asset_content_type: application/zip
+
+
+
+
+      - name: Upload (sdcard_rpi4.img)
+        if: startsWith(github.event.ref, 'refs/tags/v')
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_name: sdcard_rpi4.img
+          asset_path: sdcard_rpi4.img
+          asset_content_type: application/octet-stream
+
+
+      - name: Upload (sdcard_rpi4.zip)
+        if: startsWith(github.event.ref, 'refs/tags/v')
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_name: sdcard_rpi4.zip
+          asset_path: sdcard_rpi4.zip
           asset_content_type: application/zip

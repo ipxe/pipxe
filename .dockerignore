@@ -1,0 +1,10 @@
+#**/.git
+
+#edk2/*
+#edk2-non-osi/*
+#edk2-platforms/*
+#ipxe/*
+
+outs/*
+sdcard_rpi*.img
+sdcard_rpi*.zip
